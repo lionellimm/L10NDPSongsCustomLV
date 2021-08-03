@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">L10-NDPSongs-CustomLV</string>
+    <string-array name="spinnerItems">
+        <item>1998</item>
+        <item>1999</item>
+        <item>2000</item>
+    </string-array>
     <string name="title">Song Title</string>
     <string name="hint_title">Enter song title here</string>
     <string name="singers">Singers</string>
@@ -24,4 +29,5 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="btn5Stars">Show all songs with 5 stars</string>
+
 </resources>

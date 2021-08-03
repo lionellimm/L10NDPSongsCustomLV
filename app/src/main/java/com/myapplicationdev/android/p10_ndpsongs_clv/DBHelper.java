@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ COLUMN_TITLE + " TEXT, "
 				+ COLUMN_SINGERS + " TEXT, "
 				+ COLUMN_YEAR + " INTEGER, "
-                + COLUMN_STARS + " INTEGER )";
+                + COLUMN_STARS + " FLOAT )";
 		db.execSQL(createSongTableSql);
 		Log.i("info", createSongTableSql + "\ncreated tables");
 	}
@@ -45,7 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public long insertSong(String title, String singers, int year, int stars) {
+	public long insertSong(String title, String singers, int year, float stars) {
 		// Get an instance of the database for writing
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -124,6 +125,40 @@ public class DBHelper extends SQLiteOpenHelper {
 		return songslist;
 	}
 
+	public ArrayList<Song> getAllSongsByYear(int yearFilter) {
+		ArrayList<Song> songslist = new ArrayList<Song>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String[] columns= {COLUMN_ID, COLUMN_TITLE, COLUMN_SINGERS, COLUMN_YEAR, COLUMN_STARS};
+		String condition = COLUMN_YEAR + "= ?";
+		String[] args = {String.valueOf(yearFilter)};
+
+		Cursor cursor;
+		cursor = db.query(TABLE_SONG, columns, condition, args, null, null, null, null);
+
+		// Loop through all rows and add to ArrayList
+		if (cursor.moveToFirst()) {
+			do {
+				int id = cursor.getInt(0);
+				String title = cursor.getString(1);
+				String singers = cursor.getString(2);
+				int year = cursor.getInt(3);
+				int stars = cursor.getInt(4);
+
+				Song newSong = new Song(id, title, singers, year, stars);
+				songslist.add(newSong);
+			} while (cursor.moveToNext());
+		}
+		// Close connection
+		cursor.close();
+		db.close();
+		return songslist;
+	}
+
+
+
+
+
 	public int updateSong(Song data){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -147,5 +182,33 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return result;
     }
+
+//    public ArrayList<Song> compare(ArrayList<Song> songList, int year){
+//		ArrayList<Song> selectedSongs = new ArrayList<Song>();
+//		for(int i = 0; i < songList.size(); i++){
+//			if(songList.get(i).getYearReleased()==year){
+//				selectedSongs.add(songList.get(i));
+//			}
+//		}
+//		return selectedSongs;
+//	}
+
+	public ArrayList<String> getYears(){
+		ArrayList<String> years = new ArrayList<>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String[] columns= {COLUMN_YEAR};
+
+		Cursor cursor;
+		cursor = db.query(true, TABLE_SONG, columns, null, null, null, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				years.add(cursor.getString(0));
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+		db.close();
+		return years;
+	}
 
 }
